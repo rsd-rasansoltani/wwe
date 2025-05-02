@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صفحه فیلتر شده</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: #222;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #ff4d4d;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      text-align: right;
+      margin: 20px 0;
+      padding-right: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .countdown {
+      font-size: 1.2rem;
+      margin-top: 30px;
+      color: #00ffcc;
+    }
+
+    #timer {
+      font-weight: bold;
+      font-size: 2rem;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>این صفحه فیلتر است، پس <span style="color: #00ff00;">فیلتر شکن خود را روشن کنید</span></h1>
+
+    <ul>
+      <li>این صفحه مسابقات گذشته و زنده را نشان می‌دهد.</li>
+      <li>اولین صفحه کشتی کج در ایران، طراحی‌شده توسط <strong>راسان دیزاین</strong>.</li>
+      <li>در نبود مسابقات جدید، ممکن است مسابقات قبلی نمایش داده شود.</li>
+    </ul>
+
+    <div class="countdown">
+      ورود به صفحه در <div id="timer">10</div> ثانیه...
+    </div>
+  </div>
+
+  <script>
+    let timeLeft = 10;
+    const timerElement = document.getElementById("timer");
+
+    const countdown = setInterval(() => {
+      timeLeft--;
+      timerElement.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        window.location.href = "wwe/index.html";
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>
