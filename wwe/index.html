@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💪 تالار مشاهیر کشتی کج WWE | مسابقات زنده و گذشته</title>
-    <!-- Tailwind CSS CDN for modern and responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -46,7 +45,7 @@
             display: inline-block;
         }
 
-        /* Player Modal Styles */
+        /* Modal Overlays (Video Player and Auth Form) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -77,6 +76,17 @@
             overflow: hidden;
             box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
         }
+
+        /* Auth Form Styles */
+        #authModal .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
         
         /* Loading Animation */
         .spinner {
@@ -94,22 +104,52 @@
 </head>
 <body class="p-4 sm:p-8">
 
-    <!-- YouTube Player Modal -->
-    <div id="videoModal" class="modal-overlay" onclick="closeModal(event)">
-        <div class="video-player-frame">
+    <div id="videoModal" class="modal-overlay" onclick="closeModal(event, 'videoModal')">
+        <div class="video-player-frame" onclick="event.stopPropagation()">
             <iframe id="youtubePlayer" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
-        <button onclick="closeModal(event)" class="absolute top-4 left-4 text-white text-3xl font-bold bg-gray-800 p-2 rounded-full hover:bg-red-600 transition duration-300 z-10">×</button>
+        <button onclick="closeModal(event, 'videoModal')" class="absolute top-4 left-4 text-white text-3xl font-bold bg-gray-800 p-2 rounded-full hover:bg-red-600 transition duration-300 z-10">×</button>
     </div>
 
-    <header class="text-center mb-10">
+    <div id="authModal" class="modal-overlay" onclick="closeModal(event, 'authModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="authTitle" class="text-3xl font-extrabold mb-6 text-wwe-gold">ورود به حساب کاربری</h3>
+            
+            <form id="authForm" onsubmit="handleAuthFormSubmit(event)" class="space-y-4">
+                <input type="email" id="authEmail" required placeholder="ایمیل"
+                       class="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 text-right" dir="ltr">
+                
+                <input type="password" id="authPassword" required placeholder="رمز عبور"
+                       class="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 text-right" dir="ltr">
+                
+                <button type="submit" id="authSubmitButton" class="w-full bg-red-600 text-white font-bold p-3 rounded-lg hover:bg-red-700 transition duration-300">
+                    ورود
+                </button>
+            </form>
+
+            <p id="authMessage" class="mt-4 text-sm text-red-400 min-h-6"></p>
+
+            <button onclick="toggleAuthMode()" class="mt-4 text-sm text-gray-400 hover:text-wwe-gold transition duration-300">
+                <span id="toggleText">ثبت نام نکرده‌اید؟ برای ثبت نام کلیک کنید.</span>
+            </button>
+        </div>
+    </div>
+
+    <header class="text-center mb-10 relative">
+        <div class="absolute left-0 top-0 sm:top-2">
+            <button id="authButton" onclick="handleAuthButtonClick()" 
+                    class="bg-gray-800 text-white font-bold py-2 px-4 rounded-full text-sm hover:bg-red-600 transition duration-300 flex items-center shadow-lg shadow-red-900/30">
+                <div id="authSpinner" class="spinner border-2 h-4 w-4 rounded-full border-solid mr-2 hidden"></div>
+                <span>ورود / ثبت‌نام</span>
+            </button>
+        </div>
+
         <h1 class="wwe-title text-5xl sm:text-7xl">
             🏆 کشتی کج | WWE
         </h1>
         <p class="text-gray-400 mt-2 text-lg">جدیدترین و پرطرفدارترین مسابقات، لحظات و شوهای کمپانی WWE</p>
     </header>
 
-    <!-- Search Box -->
     <div class="flex justify-center mb-12">
         <div class="w-full max-w-2xl flex bg-gray-700 p-2 rounded-xl shadow-2xl shadow-red-900/50">
             <input type="text" id="searchQuery" placeholder="جستجوی مسابقات، سوپراستارها یا شوها..." 
@@ -122,23 +162,20 @@
         </div>
     </div>
 
-    <!-- Watch Later Videos Section (New Feature) -->
     <section class="mb-12">
         <h2 class="text-3xl font-bold border-b-4 border-wwe-red pb-2 inline-block mx-auto text-wwe-red">
             ⭐ تماشای بعدی (ذخیره شده)
         </h2>
         <p id="authStatus" class="text-sm font-normal text-gray-500 mb-4 mt-1">
-            در حال احراز هویت...
+            لطفاً برای استفاده از قابلیت ذخیره‌سازی وارد شوید.
         </p>
         <div id="watchLaterVideos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-6 justify-items-center">
-            <div class="col-span-full text-center text-gray-400 py-10">
-                <div class="spinner border-4 h-8 w-8 rounded-full border-solid mx-auto mb-2"></div>
-                لطفاً برای بارگذاری لیست تماشای بعدی صبر کنید...
-            </div>
+             <p class="col-span-full text-center text-gray-400 py-10">
+                برای مشاهده لیست ذخیره شده، وارد حساب کاربری خود شوید.
+            </p>
         </div>
     </section>
 
-    <!-- Live Videos Section -->
     <section class="mb-12">
         <h2 class="text-3xl font-bold border-b-4 border-wwe-red pb-2 inline-block mx-auto text-wwe-red">
             🔴 پخش زنده
@@ -151,7 +188,6 @@
         </div>
     </section>
 
-    <!-- Popular Videos Section -->
     <section class="mb-12">
         <h2 class="text-3xl font-bold border-b-4 border-wwe-gold pb-2 inline-block mx-auto text-wwe-gold">
             🔥 پرطرفدارترین مسابقات
@@ -164,7 +200,6 @@
         </div>
     </section>
 
-    <!-- Recorded Videos Section -->
     <section class="mb-12">
         <h2 class="text-3xl font-bold border-b-4 border-white pb-2 inline-block mx-auto text-white">
             🎬 مسابقات گذشته و جدیدترین‌ها
@@ -177,7 +212,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="text-center py-6 border-t border-gray-700 mt-10">
         <a href="#" style="color: var(--wwe-gold); text-decoration: none;" class="text-sm font-bold hover:text-red-500 transition duration-300">
             ساخته شده با عشق برای طرفداران کشتی کج | ۲۰۲۴
@@ -185,44 +219,48 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, onSnapshot, collection, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // 1. لینک‌های CDN به نسخه 10.12.0 فایربیس (بدون تغییر)
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         
-        // --- Firebase Initialization and Auth Setup ---
-        
-        // Global Firebase variables are provided by the Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        // --- Configuration (مقادیر شما حفظ شده است) ---
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyDvMzWpMJeXHY9lXRPLdnrgTGqs67cc0aE",
+            authDomain: "wwe-member.firebaseapp.com",
+            projectId: "wwe-member",
+            storageBucket: "wwe-member.firebasestorage.app",
+            messagingSenderId: "739909955124",
+            appId: "1:739909955124:web:353653bf1c248d709b6461",
+            measurementId: "G-83Y0Q42JTG"
+        };
+
+        // YouTube API Key and Channel ID
+        const API_KEY = 'AIzaSyA-NCEe2Px-LFMd-CdW-x00lZdXNOTIxMY'; 
+        const CHANNEL_ID = 'UCJ5v_MCY6GNUBTO8-D3XoAg'; // WWE Channel ID
+
+        // Global Canvas/Auth Variables
+        const appId = 'wwe-fan-app-123'; 
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app, db, auth, userId = null;
         let isAuthReady = false; 
-
-        // YouTube API Key and Channel ID
-        const API_KEY = 'AIzaSyA7SdKAZDlfqmzl0VKHAnVTtqqo4qiS0gM'; 
-        const CHANNEL_ID = 'UCJ5v_MCY6GNUBTO8-D3XoAg'; // WWE Channel ID
+        let isSigningUp = false; 
         
-        // --- Helper Functions ---
+        // --- Helper Functions (بدون تغییر) ---
         
-        /**
-         * Generic fetch wrapper with Exponential Backoff Retry mechanism.
-         * @param {string} url - The API URL to fetch.
-         * @param {number} retries - Max number of retries (default 3).
-         */
         async function fetchWithRetry(url, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url);
                     if (!response.ok) {
-                        // YouTube API often returns 400s or 403s on failure
                         const errorData = await response.json();
                         throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
                     }
                     return response;
                 } catch (error) {
                     console.error(`Attempt ${i + 1} failed:`, error.message);
-                    if (i === retries - 1) throw error; // Re-throw on last attempt
+                    if (i === retries - 1) throw error; 
                     const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
@@ -236,33 +274,23 @@
             </div>
         `;
 
-        /**
-         * Generates the HTML for a single video card.
-         * @param {string} videoId - The YouTube video ID.
-         * @param {string} title - The video title.
-         * @param {string} thumbUrl - The thumbnail URL.
-         * @param {boolean} isLive - Flag if the video is currently live.
-         * @param {boolean} isWatchLater - Flag if the video is in the Watch Later list.
-         * @param {string} docId - Firestore document ID (only for Watch Later items).
-         */
         function createVideoCard(videoId, title, thumbUrl, isLive = false, isWatchLater = false, docId = null) {
-            // Use a higher quality thumbnail if available (maxresdefault or hqdefault)
             const fallbackThumb = thumbUrl.replace('medium.jpg', 'hqdefault.jpg');
-            
-            // Clean title for JavaScript arguments
             const safeTitle = title.replace(/'/g, "\\'"); 
-
+            
+            // توابع removeFromWatchLater و addToWatchLater به window متصل شده‌اند
             const actionButton = isWatchLater ? 
                 `<button onclick="removeFromWatchLater(event, '${docId}')" class="absolute top-2 left-2 text-xl text-red-500 bg-gray-900 p-2 rounded-full hover:bg-red-700 transition duration-200 shadow-md" title="حذف از تماشای بعدی">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
                 </button>` :
-                `<button onclick="addToWatchLater(event, '${videoId}', '${safeTitle}', '${thumbUrl}')" class="absolute top-2 left-2 text-xl text-gray-300 bg-gray-900 p-2 rounded-full hover:text-wwe-gold hover:bg-gray-700 transition duration-200 shadow-md" title="افزودن به تماشای بعدی">
+                `<button onclick="addToWatchLater(event, '${videoId}', '${safeTitle}', '${thumbUrl}')" class="absolute top-2 left-2 text-xl text-gray-300 bg-gray-900 p-2 rounded-full hover:text-wwe-gold hover:bg-gray-700 transition duration-200 shadow-md ${!userId ? 'opacity-50 cursor-not-allowed' : ''}" title="${!userId ? 'برای ذخیره ویدیو باید وارد شوید' : 'افزودن به تماشای بعدی'}" ${!userId ? 'disabled' : ''}>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.636-.921 1.938 0l2.583 7.989a1 1 0 00.95.691h8.487a1 1 0 00.75-1.72l-6.837-4.99a1 1 0 00-.364-1.118l2.583-7.989c.3-.921-.084-1.921-.92-2.147l-6.837-4.99a1 1 0 00-1.118.364l-4.99 6.837c-.77.89-.25 2.147.85 2.147h8.487a1 1 0 00.95-.691l2.583-7.989z" /></svg>
                 </button>`;
 
+            // تابع openModal در جاوا اسکریپت به window متصل شده است
             return `
                 <div class="video-card w-full max-w-sm bg-card-bg rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.03] transition duration-300 ease-in-out cursor-pointer overflow-hidden transform"
-                     onclick="openModal('${videoId}')">
+                     onclick="openModal('${videoId}', 'videoModal')">
                     <div class="relative">
                         <img class="w-full h-auto object-cover rounded-t-xl aspect-video" 
                              src="${fallbackThumb}" 
@@ -278,15 +306,12 @@
             `;
         }
 
-        /**
-         * Displays videos in a specific container.
-         */
         function renderVideos(items, containerId, isLive = false, isWatchLater = false) {
             const container = document.getElementById(containerId);
             container.innerHTML = ''; 
 
             if (!items || items.length === 0) {
-                const message = isWatchLater ? 'لیست تماشای بعدی شما خالی است. ویدیوها را ذخیره کنید!' : 'ویدیویی برای نمایش پیدا نشد.';
+                const message = isWatchLater ? (userId ? 'لیست تماشای بعدی شما خالی است. ویدیوها را ذخیره کنید!' : 'برای استفاده از این قابلیت وارد شوید.') : 'ویدیویی برای نمایش پیدا نشد.';
                 container.innerHTML = `<p class="col-span-full text-center text-gray-400 py-10">${message}</p>`;
                 return;
             }
@@ -295,7 +320,7 @@
                 const videoId = isWatchLater ? item.videoId : (item.id.videoId || item.id);
                 const title = item.title || item.snippet.title;
                 const thumb = item.thumbUrl || item.snippet.thumbnails.medium.url;
-                const docId = item.docId; // Only available for Watch Later items
+                const docId = item.docId;
 
                 container.innerHTML += createVideoCard(videoId, title, thumb, isLive, isWatchLater, docId);
             });
@@ -303,18 +328,23 @@
         
         // --- Firestore (Watch Later) Functions ---
 
-        /**
-         * Subscribes to the user's Watch Later list in Firestore.
-         */
         function subscribeToWatchLater() {
-            if (!isAuthReady || !userId || !db) return;
-            
-            const statusElement = document.getElementById('authStatus');
-            statusElement.innerHTML = `شناسه کاربری: <span class="text-wwe-gold">${userId}</span>`;
-            
-            const collectionPath = `/artifacts/${appId}/users/${userId}/watchLater`;
-            const watchLaterRef = collection(db, collectionPath);
             const container = document.getElementById('watchLaterVideos');
+            if (!isAuthReady) {
+                 container.innerHTML = loadingHTML('در حال بررسی وضعیت احراز هویت...');
+                 return;
+            }
+
+            if (!userId || !db) {
+                document.getElementById('authStatus').innerHTML = 'لطفاً برای استفاده از قابلیت ذخیره‌سازی وارد شوید.';
+                renderVideos([], 'watchLaterVideos', false, true);
+                return;
+            }
+            
+            document.getElementById('authStatus').innerHTML = `وضعیت: <span class="text-green-500">ورود موفق</span> | شناسه کاربری: <span class="text-wwe-gold">${userId}</span>`;
+            
+            const collectionPath = `artifacts/${appId}/users/${userId}/watchLater`;
+            const watchLaterRef = collection(db, collectionPath);
             container.innerHTML = loadingHTML('در حال بارگذاری لیست تماشای بعدی...');
 
             onSnapshot(watchLaterRef, (snapshot) => {
@@ -332,17 +362,15 @@
             });
         }
 
-        /**
-         * Adds a video to the user's Watch Later list.
-         */
+        // 3. رفع خطای ReferenceError با اتصال به window
         window.addToWatchLater = async function(event, videoId, title, thumbUrl) {
-            event.stopPropagation(); // Prevent modal opening
+            event.stopPropagation();
             if (!userId) {
-                alert('لطفا صبر کنید تا احراز هویت انجام شود. سپس دوباره تلاش کنید.');
+                showAuthModal();
                 return;
             }
             try {
-                const collectionPath = `/artifacts/${appId}/users/${userId}/watchLater`;
+                const collectionPath = `artifacts/${appId}/users/${userId}/watchLater`;
                 await addDoc(collection(db, collectionPath), {
                     videoId: videoId,
                     title: title,
@@ -350,31 +378,146 @@
                     addedAt: Date.now()
                 });
                 console.log("Added to Watch Later:", videoId);
-                // Optionally show a quick success message
             } catch (error) {
                 console.error("Error adding video to Watch Later:", error);
-                alert('❌ خطا در ذخیره ویدیو. لطفا دوباره امتحان کنید.');
+                document.getElementById('authStatus').innerHTML = '❌ خطا در ذخیره ویدیو. لطفاً دوباره امتحان کنید.';
             }
         }
 
-        /**
-         * Removes a video from the user's Watch Later list.
-         */
+        // 3. رفع خطای ReferenceError با اتصال به window
         window.removeFromWatchLater = async function(event, docId) {
-            event.stopPropagation(); // Prevent modal opening
+            event.stopPropagation();
             if (!userId) return;
             try {
-                const docPath = `/artifacts/${appId}/users/${userId}/watchLater/${docId}`;
+                const docPath = `artifacts/${appId}/users/${userId}/watchLater/${docId}`;
                 await deleteDoc(doc(db, docPath));
                 console.log("Removed from Watch Later:", docId);
             } catch (error) {
                 console.error("Error removing video from Watch Later:", error);
-                alert('❌ خطا در حذف ویدیو.');
+                document.getElementById('authStatus').innerHTML = '❌ خطا در حذف ویدیو.';
             }
         }
 
-        // --- YouTube API Fetch Functions ---
+        // --- Authentication Functions ---
+        
+        // 1. رفع خطای ReferenceError: handleAuthButtonClick به دلیل عدم اتصال به window
+        window.handleAuthButtonClick = function() {
+            if (userId) {
+                userSignOut(); 
+            } else {
+                showAuthModal();
+            }
+        }
 
+        function updateAuthUI(user) {
+            const authButton = document.getElementById('authButton');
+            const authStatus = document.getElementById('authStatus');
+            const authSpinner = document.getElementById('authSpinner');
+
+            authSpinner.classList.add('hidden');
+            
+            if (user) {
+                userId = user.uid;
+                authButton.querySelector('span').textContent = 'خروج';
+                authButton.classList.remove('bg-gray-800');
+                authButton.classList.add('bg-wwe-red');
+                subscribeToWatchLater();
+            } else {
+                userId = null;
+                authButton.querySelector('span').textContent = 'ورود / ثبت‌نام';
+                authButton.classList.remove('bg-wwe-red');
+                authButton.classList.add('bg-gray-800');
+                authStatus.innerHTML = 'لطفاً برای استفاده از قابلیت ذخیره‌سازی وارد شوید.';
+                // Re-render videos to disable 'Watch Later' buttons
+                renderVideos([], 'watchLaterVideos', false, true);
+            }
+            document.querySelectorAll('[onclick^="addToWatchLater"]').forEach(btn => {
+                btn.disabled = !user;
+                btn.title = !user ? 'برای ذخیره ویدیو باید وارد شوید' : 'افزودن به تماشای بعدی';
+                btn.classList.toggle('opacity-50', !user);
+                btn.classList.toggle('cursor-not-allowed', !user);
+            });
+        }
+
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            isSigningUp = false;
+            window.toggleAuthMode();
+        }
+        
+        // 1. رفع خطای ReferenceError: toggleAuthMode به دلیل عدم اتصال به window
+        window.toggleAuthMode = function() {
+            isSigningUp = !isSigningUp;
+            document.getElementById('authTitle').textContent = isSigningUp ? 'ثبت‌نام کاربر جدید' : 'ورود به حساب کاربری';
+            document.getElementById('authSubmitButton').textContent = isSigningUp ? 'ثبت‌نام' : 'ورود';
+            document.getElementById('toggleText').textContent = isSigningUp ? 'قبلاً ثبت‌نام کرده‌اید؟ برای ورود کلیک کنید.' : 'ثبت نام نکرده‌اید؟ برای ثبت نام کلیک کنید.';
+            document.getElementById('authMessage').textContent = '';
+        }
+
+        // تابع userSignOut در جاوا اسکریپت به window متصل شده است
+        window.userSignOut = async function() {
+            try {
+                await signOut(auth);
+                console.log("User signed out.");
+            } catch (error) {
+                console.error("Error signing out:", error);
+                document.getElementById('authStatus').innerHTML = `❌ خطا در خروج: ${error.message}`;
+            }
+        }
+        
+        // تابع handleAuthFormSubmit در جاوا اسکریپت به window متصل شده است
+        window.handleAuthFormSubmit = async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const messageElement = document.getElementById('authMessage');
+            const submitButton = document.getElementById('authSubmitButton');
+
+            messageElement.textContent = 'در حال پردازش...';
+            submitButton.disabled = true;
+
+            try {
+                if (isSigningUp) {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    messageElement.textContent = '✅ ثبت‌نام موفق! به صورت خودکار وارد شدید.';
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    messageElement.textContent = '✅ ورود موفق!';
+                }
+                setTimeout(() => closeModal(null, 'authModal'), 1000);
+            } catch (error) {
+                console.error("Auth Error:", error);
+                let errorMessage = 'خطای نامشخص در احراز هویت.';
+
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'ایمیل یا رمز عبور اشتباه است.';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'این ایمیل قبلاً ثبت‌نام شده است.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'رمز عبور باید حداقل ۶ کاراکتر باشد.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'فرمت ایمیل نامعتبر است.';
+                        break;
+                    case 'auth/configuration-not-found':
+                        errorMessage = 'خطای پیکربندی: لطفاً مطمئن شوید سرویس Email/Password در کنسول فایربیس فعال است.';
+                        break;
+                    default:
+                        errorMessage = `خطا: ${error.message}`;
+                }
+                messageElement.textContent = `❌ ${errorMessage}`;
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+        
+        // --- YouTube API Fetch Functions (بدون تغییر) ---
+        
         function fetchLiveVideos() {
             const container = document.getElementById('liveVideos');
             container.innerHTML = loadingHTML('در حال جستجوی مسابقات زنده...');
@@ -390,11 +533,17 @@
                     }
                 })
                 .catch(err => {
-                    container.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">❌ خطا در بارگذاری مسابقات زنده. (بررسی کنید که کلید API معتبر باشد.)</p>`;
+                    container.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">❌ خطا در بارگذاری مسابقات زنده.</p>`;
                     console.error('Error fetching live videos:', err);
                 });
         }
 
+        // تابع searchVideos در جاوا اسکریپت به window متصل شده است
+        window.searchVideos = function() {
+            const query = document.getElementById('searchQuery').value.trim();
+            fetchRecordedVideos(query);
+        }
+        
         function fetchRecordedVideos(query = 'WWE Match highlights') {
             const container = document.getElementById('recordedVideos');
             container.innerHTML = loadingHTML('در حال بارگذاری جدیدترین ویدیوها...');
@@ -409,7 +558,7 @@
                     document.querySelector('section:nth-of-type(4) h2').textContent = query ? `نتایج جستجو برای: "${query}"` : '🎬 مسابقات گذشته و جدیدترین‌ها';
                 })
                 .catch(err => {
-                    container.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">❌ خطا در بارگذاری مسابقات گذشته. (بررسی کنید که کلید API معتبر باشد.)</p>`;
+                    container.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">❌ خطا در بارگذاری مسابقات گذشته.</p>`;
                     console.error('Error fetching recorded videos:', err);
                 });
         }
@@ -418,7 +567,7 @@
             const container = document.getElementById('popularVideos');
             container.innerHTML = loadingHTML('در حال بارگذاری پرطرفدارترین ویدیوها...');
 
-            const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=viewCount&maxResults=4&type=video&q=WWE greatest moments`;
+            const url = `https://www.googleapis.com/googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=viewCount&maxResults=4&type=video&q=WWE greatest moments`;
             
             fetchWithRetry(url)
                 .then(res => res.json())
@@ -431,74 +580,82 @@
                 });
         }
 
-        // --- UI Interactions ---
+        // --- UI Interactions (بدون تغییر) ---
 
-        window.searchVideos = function() {
-            const query = document.getElementById('searchQuery').value.trim();
-            fetchRecordedVideos(query);
-        }
-
-        window.openModal = function(videoId) {
-            const modal = document.getElementById('videoModal');
-            const player = document.getElementById('youtubePlayer');
-            player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden'; 
-        }
-
-        window.closeModal = function(event) {
-            // Check if click was on the overlay or close button
-            if (event.target.id === 'videoModal' || event.target.tagName === 'BUTTON') {
-                const modal = document.getElementById('videoModal');
+        // تابع openModal در جاوا اسکریپت به window متصل شده است
+        window.openModal = function(videoId, modalId) {
+            if (modalId === 'videoModal') {
+                const modal = document.getElementById(modalId);
                 const player = document.getElementById('youtubePlayer');
-                player.src = ''; 
-                modal.classList.remove('open');
-                document.body.style.overflow = 'auto'; 
+                player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
             }
         }
+
+        // تابع closeModal در جاوا اسکریپت به window متصل شده است
+        window.closeModal = function(event, modalId) {
+             const modal = document.getElementById(modalId);
+             if (!event || event.target.id === modalId || event.target.tagName === 'BUTTON') {
+                if (modalId === 'videoModal') {
+                    document.getElementById('youtubePlayer').src = ''; 
+                }
+                modal.classList.remove('open');
+                document.body.style.overflow = 'auto'; 
+             }
+        }
         
-        // --- Initialization ---
+        // --- Initialization (با رفع اشکال getApps) ---
 
         async function initFirebase() {
+            document.getElementById('authSpinner').classList.remove('hidden');
+
             try {
-                if (Object.keys(firebaseConfig).length === 0) {
+                if (!FIREBASE_CONFIG.apiKey) {
                     console.warn("Firebase config is missing. Skipping database features.");
                     document.getElementById('authStatus').textContent = "❌ خطا: تنظیمات فایربیس وجود ندارد.";
                     isAuthReady = true;
+                    updateAuthUI(null);
                     return;
                 }
                 
-                app = initializeApp(firebaseConfig);
+                // 2. رفع خطای "Firebase App named '[DEFAULT]' already exists" با استفاده از getApps
+                if (getApps().length === 0) {
+                    app = initializeApp(FIREBASE_CONFIG);
+                } else {
+                    app = getApps()[0];
+                }
+                
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                const statusElement = document.getElementById('authStatus');
-                statusElement.textContent = "در حال احراز هویت...";
-                
+                await setPersistence(auth, browserSessionPersistence);
+
                 if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
+                    try {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Signed in using initial auth token.");
+                    } catch (e) {
+                        console.warn("Custom token sign-in failed. Proceeding with onAuthStateChanged.");
+                    }
                 }
 
-                // Wait for the auth state change to get the final user ID
                 onAuthStateChanged(auth, (user) => {
+                    isAuthReady = true;
                     if (user) {
-                        userId = user.uid;
-                        isAuthReady = true;
-                        console.log("Firebase Auth Ready. User ID:", userId);
-                        // Once authenticated, subscribe to real-time data
-                        subscribeToWatchLater(); 
+                        console.log("User authenticated:", user.uid);
                     } else {
-                        userId = null;
-                        isAuthReady = true;
-                        statusElement.textContent = "❌ خطای احراز هویت. ویژگی‌های ذخیره‌سازی غیرفعال هستند.";
+                        console.log("User is not authenticated. Awaiting login.");
                     }
+                    updateAuthUI(user);
                 });
+                
             } catch (error) {
                 console.error("Firebase Initialization/Auth Error:", error);
                 document.getElementById('authStatus').textContent = `❌ خطای عمومی در سیستم: ${error.message.substring(0, 50)}...`;
+                document.getElementById('authSpinner').classList.add('hidden');
                 isAuthReady = true;
+                updateAuthUI(null);
             }
         }
 
