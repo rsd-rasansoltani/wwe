@@ -77,8 +77,8 @@
             box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
         }
 
-        /* Auth Form Styles */
-        #authModal .modal-content {
+        /* Auth Form & Geo Error Styles */
+        #authModal .modal-content, #geoErrorModal .modal-content {
             background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
@@ -104,6 +104,25 @@
 </head>
 <body class="p-4 sm:p-8">
 
+<div id="geoErrorModal" class="modal-overlay open" style="z-index: 9999;"> 
+    <div class="modal-content" onclick="event.stopPropagation()" style="padding: 30px; border-radius: 12px;; width: 90%; max-width: 450px; text-align: center; background-color: red;">
+        <h3 class="text-3xl font-extrabold mb-4 text-wwe-red">🚫 محدودیت منطقه‌ای</h3>
+        
+        <p class="text-white mb-6 text-lg">
+            متأسفانه، دسترسی از طریق **IP ایران** امکان‌پذیر نیست.
+        </p>
+        
+        <p class="text-gray-300 mb-8">
+            لطفاً از یک ابزار تغییر IP (VPN) استفاده نمایید، یا برای اطلاعات بیشتر به وبسایت زیر مراجعه کنید:
+        </p>
+        
+        <a href="https://rasandesign.ir" target="_blank" class="w-full block">
+            <button class="w-full bg-wwe-gold text-gray-900 font-bold p-4 text-lg rounded-lg hover:bg-yellow-400 transition duration-300 shadow-xl">
+                🚀 ورود به راسان دیزاین
+            </button>
+        </a>
+    </div>
+</div>
     <div id="videoModal" class="modal-overlay" onclick="closeModal(event, 'videoModal')">
         <div class="video-player-frame" onclick="event.stopPropagation()">
             <iframe id="youtubePlayer" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -247,7 +266,7 @@
         let isAuthReady = false; 
         let isSigningUp = false; 
         
-        // --- Helper Functions (بدون تغییر) ---
+        // --- Helper Functions (شامل تابع checkGeoLocation) ---
         
         async function fetchWithRetry(url, retries = 3) {
             for (let i = 0; i < retries; i++) {
@@ -264,6 +283,25 @@
                     const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
+            }
+        }
+        
+        // تابع جدید: بررسی موقعیت جغرافیایی
+        async function checkGeoLocation() {
+            try {
+                // استفاده از سرویس ip-api.com
+                const response = await fetch('http://ip-api.com/json/?fields=status,countryCode');
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.countryCode === 'IR') {
+                    return true; // ایران است
+                }
+                return false; // ایران نیست
+                
+            } catch (error) {
+                // در صورت خطا، اجازه دسترسی را بده
+                console.error("Error fetching geo location:", error);
+                return false;
             }
         }
 
@@ -580,7 +618,12 @@
                 });
         }
 
-        // --- UI Interactions (بدون تغییر) ---
+        // --- UI Interactions (شامل showGeoErrorModal) ---
+        
+        function showGeoErrorModal() {
+            document.getElementById('geoErrorModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
 
         // تابع openModal در جاوا اسکریپت به window متصل شده است
         window.openModal = function(videoId, modalId) {
@@ -605,7 +648,7 @@
              }
         }
         
-        // --- Initialization (با رفع اشکال getApps) ---
+        // --- Initialization (با منطق بررسی IP) ---
 
         async function initFirebase() {
             document.getElementById('authSpinner').classList.remove('hidden');
@@ -659,11 +702,20 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initFirebase();
-            fetchLiveVideos();
-            fetchPopularVideos();
-            fetchRecordedVideos();
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isIran = await checkGeoLocation(); // بررسی IP
+
+            if (isIran) {
+                // اگر کاربر در ایران بود، مودال را نمایش داده و از ادامه اجرای کدهای API و Firebase جلوگیری کن
+                showGeoErrorModal();
+                console.log("Access restricted for Iran IP.");
+            } else {
+                // اگر مشکلی نبود، بارگذاری عادی را شروع کن
+                initFirebase();
+                fetchLiveVideos();
+                fetchPopularVideos();
+                fetchRecordedVideos();
+            }
         });
     </script>
 </body>
