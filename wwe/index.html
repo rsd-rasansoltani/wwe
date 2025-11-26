@@ -104,25 +104,24 @@
 </head>
 <body class="p-4 sm:p-8">
 
-<div id="geoErrorModal" class="modal-overlay open" style="z-index: 9999;"> 
-    <div class="modal-content" onclick="event.stopPropagation()" style="padding: 30px; border-radius: 12px;; width: 90%; max-width: 450px; text-align: center; background-color: red;">
-        <h3 class="text-3xl font-extrabold mb-4 text-wwe-red">🚫 محدودیت منطقه‌ای</h3>
-        
-        <p class="text-white mb-6 text-lg">
-            متأسفانه، دسترسی از طریق **IP ایران** امکان‌پذیر نیست.
-        </p>
-        
-        <p class="text-gray-300 mb-8">
-            لطفاً از یک ابزار تغییر IP (VPN) استفاده نمایید، یا برای اطلاعات بیشتر به وبسایت زیر مراجعه کنید:
-        </p>
-        
-        <a href="https://rasandesign.ir" target="_blank" class="w-full block">
-            <button class="w-full bg-wwe-gold text-gray-900 font-bold p-4 text-lg rounded-lg hover:bg-yellow-400 transition duration-300 shadow-xl">
-                🚀 ورود به راسان دیزاین
+    <div id="geoErrorModal" class="modal-overlay" onclick="closeModal(event, 'geoErrorModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 class="text-3xl font-extrabold mb-4 text-wwe-red">🚫 دسترسی محدود</h3>
+            
+            <p class="text-white mb-6 text-lg">
+                متأسفانه، به نظر می‌رسد شما با **IP ایران** وارد شده‌اید.
+            </p>
+            
+            <p class="text-gray-300 mb-8">
+                برای دسترسی کامل به ویدیوها، لطفاً از یک سرویس <strong class="text-wwe-gold">VPN</strong> استفاده کرده و مجدداً تلاش نمایید.
+            </p>
+            
+            <button onclick="closeModal(null, 'geoErrorModal')" class="w-full bg-wwe-gold text-gray-900 font-bold p-3 rounded-lg hover:bg-yellow-400 transition duration-300">
+                متوجه شدم
             </button>
-        </a>
+        </div>
     </div>
-</div>
+    
     <div id="videoModal" class="modal-overlay" onclick="closeModal(event, 'videoModal')">
         <div class="video-player-frame" onclick="event.stopPropagation()">
             <iframe id="youtubePlayer" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -132,25 +131,26 @@
 
     <div id="authModal" class="modal-overlay" onclick="closeModal(event, 'authModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 id="authTitle" class="text-3xl font-extrabold mb-6 text-wwe-gold">ورود به حساب کاربری</h3>
+            <h3 id="authTitle" class="text-3xl font-extrabold mb-6 text-wwe-gold">ورود یا ثبت‌نام</h3>
             
-            <form id="authForm" onsubmit="handleAuthFormSubmit(event)" class="space-y-4">
-                <input type="email" id="authEmail" required placeholder="ایمیل"
-                       class="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 text-right" dir="ltr">
-                
-                <input type="password" id="authPassword" required placeholder="رمز عبور"
-                       class="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 text-right" dir="ltr">
-                
-                <button type="submit" id="authSubmitButton" class="w-full bg-red-600 text-white font-bold p-3 rounded-lg hover:bg-red-700 transition duration-300">
-                    ورود
+            <div id="authProviders" class="space-y-4">
+                <button type="button" onclick="signInWithProvider('google')"
+                        class="w-full bg-red-600 text-white font-bold p-3 rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.0001 4.58667C14.0001 4.58667 15.6001 5.23334 16.9001 6.31334L19.5734 3.64C17.6534 1.83334 15.0001 0.880005 12.0001 0.880005C7.4001 0.880005 3.39343 3.49334 1.57343 7.37334L4.85343 9.94667C5.64677 7.74667 8.5201 6.13334 12.0001 6.13334C13.8001 6.13334 15.2001 6.58667 16.2668 7.37334L19.5601 3.65334C17.6401 1.84667 15.0001 0.880005 12.0001 0.880005ZM12.0001 16.5333C9.0001 16.5333 6.6401 15.36 5.34677 13.56L2.06677 16.1333C3.88677 19.8933 7.89343 22.5067 12.0001 22.5067C15.0001 22.5067 17.6401 21.5333 19.5601 19.72L16.2668 16.0067C15.2001 16.7933 13.8001 17.2467 12.0001 17.2467V16.5333Z" />
+                    </svg>
+                    ورود با حساب گوگل
                 </button>
-            </form>
-
+                <button type="button" onclick="signInWithProvider('facebook')"
+                        class="w-full bg-blue-800 text-white font-bold p-3 rounded-lg hover:bg-blue-900 transition duration-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 10h3v4h-3v7h-4v-7h-3v-4h3v-2.099c0-2.791 1.63-4.901 4.706-4.901h3.294v4h-3.294c-.672 0-.706.311-.706.772v2.228z"/>
+                    </svg>
+                    ورود با حساب فیسبوک
+                </button>
+            </div>
+            
             <p id="authMessage" class="mt-4 text-sm text-red-400 min-h-6"></p>
-
-            <button onclick="toggleAuthMode()" class="mt-4 text-sm text-gray-400 hover:text-wwe-gold transition duration-300">
-                <span id="toggleText">ثبت نام نکرده‌اید؟ برای ثبت نام کلیک کنید.</span>
-            </button>
         </div>
     </div>
 
@@ -238,12 +238,12 @@
     </footer>
 
     <script type="module">
-        // 1. لینک‌های CDN به نسخه 10.12.0 فایربیس (بدون تغییر)
+        // 1. لینک‌های CDN با توابع جدید برای Google و Facebook
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, signOut, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, addDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         
-        // --- Configuration (مقادیر شما حفظ شده است) ---
+        // --- Configuration (بدون تغییر) ---
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyDvMzWpMJeXHY9lXRPLdnrgTGqs67cc0aE",
             authDomain: "wwe-member.firebaseapp.com",
@@ -254,9 +254,9 @@
             measurementId: "G-83Y0Q42JTG"
         };
 
-        // YouTube API Key and Channel ID
+        // YouTube API Key and Channel ID (حفظ شدند)
         const API_KEY = 'AIzaSyA-NCEe2Px-LFMd-CdW-x00lZdXNOTIxMY'; 
-        const CHANNEL_ID = 'UCJ5v_MCY6GNUBTO8-D3XoAg'; // WWE Channel ID
+        const CHANNEL_ID = 'UCJ5v_MCY6GNUBTO8-D3XoAg'; 
 
         // Global Canvas/Auth Variables
         const appId = 'wwe-fan-app-123'; 
@@ -264,9 +264,9 @@
 
         let app, db, auth, userId = null;
         let isAuthReady = false; 
-        let isSigningUp = false; 
-        
-        // --- Helper Functions (شامل تابع checkGeoLocation) ---
+        // confirmationResult حذف شد
+
+        // --- Helper Functions (بدون تغییر) ---
         
         async function fetchWithRetry(url, retries = 3) {
             for (let i = 0; i < retries; i++) {
@@ -286,20 +286,17 @@
             }
         }
         
-        // تابع جدید: بررسی موقعیت جغرافیایی
         async function checkGeoLocation() {
             try {
-                // استفاده از سرویس ip-api.com
                 const response = await fetch('http://ip-api.com/json/?fields=status,countryCode');
                 const data = await response.json();
                 
                 if (data.status === 'success' && data.countryCode === 'IR') {
-                    return true; // ایران است
+                    return true; 
                 }
-                return false; // ایران نیست
+                return false; 
                 
             } catch (error) {
-                // در صورت خطا، اجازه دسترسی را بده
                 console.error("Error fetching geo location:", error);
                 return false;
             }
@@ -316,7 +313,6 @@
             const fallbackThumb = thumbUrl.replace('medium.jpg', 'hqdefault.jpg');
             const safeTitle = title.replace(/'/g, "\\'"); 
             
-            // توابع removeFromWatchLater و addToWatchLater به window متصل شده‌اند
             const actionButton = isWatchLater ? 
                 `<button onclick="removeFromWatchLater(event, '${docId}')" class="absolute top-2 left-2 text-xl text-red-500 bg-gray-900 p-2 rounded-full hover:bg-red-700 transition duration-200 shadow-md" title="حذف از تماشای بعدی">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
@@ -325,7 +321,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.636-.921 1.938 0l2.583 7.989a1 1 0 00.95.691h8.487a1 1 0 00.75-1.72l-6.837-4.99a1 1 0 00-.364-1.118l2.583-7.989c.3-.921-.084-1.921-.92-2.147l-6.837-4.99a1 1 0 00-1.118.364l-4.99 6.837c-.77.89-.25 2.147.85 2.147h8.487a1 1 0 00.95-.691l2.583-7.989z" /></svg>
                 </button>`;
 
-            // تابع openModal در جاوا اسکریپت به window متصل شده است
             return `
                 <div class="video-card w-full max-w-sm bg-card-bg rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.03] transition duration-300 ease-in-out cursor-pointer overflow-hidden transform"
                      onclick="openModal('${videoId}', 'videoModal')">
@@ -364,7 +359,7 @@
             });
         }
         
-        // --- Firestore (Watch Later) Functions ---
+        // --- Firestore (Watch Later) Functions (بدون تغییر) ---
 
         function subscribeToWatchLater() {
             const container = document.getElementById('watchLaterVideos');
@@ -400,7 +395,6 @@
             });
         }
 
-        // 3. رفع خطای ReferenceError با اتصال به window
         window.addToWatchLater = async function(event, videoId, title, thumbUrl) {
             event.stopPropagation();
             if (!userId) {
@@ -422,7 +416,6 @@
             }
         }
 
-        // 3. رفع خطای ReferenceError با اتصال به window
         window.removeFromWatchLater = async function(event, docId) {
             event.stopPropagation();
             if (!userId) return;
@@ -436,9 +429,8 @@
             }
         }
 
-        // --- Authentication Functions ---
+        // --- Authentication Functions (تغییر یافته) ---
         
-        // 1. رفع خطای ReferenceError: handleAuthButtonClick به دلیل عدم اتصال به window
         window.handleAuthButtonClick = function() {
             if (userId) {
                 userSignOut(); 
@@ -466,7 +458,6 @@
                 authButton.classList.remove('bg-wwe-red');
                 authButton.classList.add('bg-gray-800');
                 authStatus.innerHTML = 'لطفاً برای استفاده از قابلیت ذخیره‌سازی وارد شوید.';
-                // Re-render videos to disable 'Watch Later' buttons
                 renderVideos([], 'watchLaterVideos', false, true);
             }
             document.querySelectorAll('[onclick^="addToWatchLater"]').forEach(btn => {
@@ -480,20 +471,10 @@
         function showAuthModal() {
             document.getElementById('authModal').classList.add('open');
             document.body.style.overflow = 'hidden';
-            isSigningUp = false;
-            window.toggleAuthMode();
-        }
-        
-        // 1. رفع خطای ReferenceError: toggleAuthMode به دلیل عدم اتصال به window
-        window.toggleAuthMode = function() {
-            isSigningUp = !isSigningUp;
-            document.getElementById('authTitle').textContent = isSigningUp ? 'ثبت‌نام کاربر جدید' : 'ورود به حساب کاربری';
-            document.getElementById('authSubmitButton').textContent = isSigningUp ? 'ثبت‌نام' : 'ورود';
-            document.getElementById('toggleText').textContent = isSigningUp ? 'قبلاً ثبت‌نام کرده‌اید؟ برای ورود کلیک کنید.' : 'ثبت نام نکرده‌اید؟ برای ثبت نام کلیک کنید.';
+            // پاک کردن پیام‌های قبلی
             document.getElementById('authMessage').textContent = '';
         }
-
-        // تابع userSignOut در جاوا اسکریپت به window متصل شده است
+        
         window.userSignOut = async function() {
             try {
                 await signOut(auth);
@@ -503,57 +484,56 @@
                 document.getElementById('authStatus').innerHTML = `❌ خطا در خروج: ${error.message}`;
             }
         }
-        
-        // تابع handleAuthFormSubmit در جاوا اسکریپت به window متصل شده است
-        window.handleAuthFormSubmit = async function(event) {
-            event.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-            const messageElement = document.getElementById('authMessage');
-            const submitButton = document.getElementById('authSubmitButton');
 
-            messageElement.textContent = 'در حال پردازش...';
-            submitButton.disabled = true;
+        // --- تابع جدید ورود با Provider (Google/Facebook) ---
+        window.signInWithProvider = async function(providerName) {
+            const messageElement = document.getElementById('authMessage');
+            messageElement.textContent = `در حال اتصال به ${providerName === 'google' ? 'گوگل' : 'فیسبوک'}...`;
+
+            let provider;
+            
+            if (providerName === 'google') {
+                provider = new GoogleAuthProvider();
+            } else if (providerName === 'facebook') {
+                provider = new FacebookAuthProvider();
+                // اختیاری: تنظیم زبان به فارسی (در صورت پشتیبانی فایربیس و فیسبوک)
+                // provider.addScope('public_profile');
+            } else {
+                messageElement.textContent = '❌ سرویس احراز هویت نامعتبر است.';
+                return;
+            }
 
             try {
-                if (isSigningUp) {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    messageElement.textContent = '✅ ثبت‌نام موفق! به صورت خودکار وارد شدید.';
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    messageElement.textContent = '✅ ورود موفق!';
-                }
+                // استفاده از Pop-up برای ورود
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                console.log(`${providerName} Auth Success:`, user.uid);
+                messageElement.textContent = `✅ ورود موفق با ${providerName === 'google' ? 'گوگل' : 'فیسبوک'}!`;
+                
                 setTimeout(() => closeModal(null, 'authModal'), 1000);
-            } catch (error) {
-                console.error("Auth Error:", error);
-                let errorMessage = 'خطای نامشخص در احراز هویت.';
 
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = 'ایمیل یا رمز عبور اشتباه است.';
-                        break;
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'این ایمیل قبلاً ثبت‌نام شده است.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = 'رمز عبور باید حداقل ۶ کاراکتر باشد.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'فرمت ایمیل نامعتبر است.';
-                        break;
-                    case 'auth/configuration-not-found':
-                        errorMessage = 'خطای پیکربندی: لطفاً مطمئن شوید سرویس Email/Password در کنسول فایربیس فعال است.';
-                        break;
-                    default:
-                        errorMessage = `خطا: ${error.message}`;
+            } catch (error) {
+                console.error(`Error with ${providerName} sign-in:`, error);
+                
+                let errorMessage = 'خطا در ورود. لطفاً دوباره تلاش کنید.';
+                
+                // هندل کردن خطای بستن پنجره Pop-up
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'ورود توسط کاربر لغو شد.';
+                } else if (error.code === 'auth/cancelled-popup-request') {
+                    errorMessage = 'درخواست ورود قبلی در حال اجرا بود. لطفاً فقط یک بار کلیک کنید.';
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                     errorMessage = 'حسابی با ایمیل مشابه وجود دارد. با روش دیگری وارد شوید.';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    // این خطا یعنی Provider در کنسول Firebase فعال نیست
+                    errorMessage = `❌ خطای فایربیس: لطفاً روش ورود ${providerName.toUpperCase()} را در کنسول فایربیس فعال کنید.`;
                 }
+
                 messageElement.textContent = `❌ ${errorMessage}`;
-            } finally {
-                submitButton.disabled = false;
             }
         }
-        
+
         // --- YouTube API Fetch Functions (بدون تغییر) ---
         
         function fetchLiveVideos() {
@@ -576,7 +556,6 @@
                 });
         }
 
-        // تابع searchVideos در جاوا اسکریپت به window متصل شده است
         window.searchVideos = function() {
             const query = document.getElementById('searchQuery').value.trim();
             fetchRecordedVideos(query);
@@ -605,7 +584,7 @@
             const container = document.getElementById('popularVideos');
             container.innerHTML = loadingHTML('در حال بارگذاری پرطرفدارترین ویدیوها...');
 
-            const url = `https://www.googleapis.com/googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=viewCount&maxResults=4&type=video&q=WWE greatest moments`;
+            const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=viewCount&maxResults=4&type=video&q=WWE greatest moments`;
             
             fetchWithRetry(url)
                 .then(res => res.json())
@@ -618,14 +597,13 @@
                 });
         }
 
-        // --- UI Interactions (شامل showGeoErrorModal) ---
+        // --- UI Interactions (بدون تغییر) ---
         
         function showGeoErrorModal() {
             document.getElementById('geoErrorModal').classList.add('open');
             document.body.style.overflow = 'hidden';
         }
 
-        // تابع openModal در جاوا اسکریپت به window متصل شده است
         window.openModal = function(videoId, modalId) {
             if (modalId === 'videoModal') {
                 const modal = document.getElementById(modalId);
@@ -636,7 +614,6 @@
             }
         }
 
-        // تابع closeModal در جاوا اسکریپت به window متصل شده است
         window.closeModal = function(event, modalId) {
              const modal = document.getElementById(modalId);
              if (!event || event.target.id === modalId || event.target.tagName === 'BUTTON') {
@@ -648,7 +625,7 @@
              }
         }
         
-        // --- Initialization (با منطق بررسی IP) ---
+        // --- Initialization (حذف منطق reCAPTCHA) ---
 
         async function initFirebase() {
             document.getElementById('authSpinner').classList.remove('hidden');
@@ -662,7 +639,6 @@
                     return;
                 }
                 
-                // 2. رفع خطای "Firebase App named '[DEFAULT]' already exists" با استفاده از getApps
                 if (getApps().length === 0) {
                     app = initializeApp(FIREBASE_CONFIG);
                 } else {
@@ -672,6 +648,8 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
+                // منطق reCAPTCHA و Phone Auth حذف شد.
+                
                 await setPersistence(auth, browserSessionPersistence);
 
                 if (initialAuthToken) {
@@ -703,14 +681,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const isIran = await checkGeoLocation(); // بررسی IP
+            const isIran = await checkGeoLocation(); 
 
             if (isIran) {
-                // اگر کاربر در ایران بود، مودال را نمایش داده و از ادامه اجرای کدهای API و Firebase جلوگیری کن
                 showGeoErrorModal();
                 console.log("Access restricted for Iran IP.");
             } else {
-                // اگر مشکلی نبود، بارگذاری عادی را شروع کن
                 initFirebase();
                 fetchLiveVideos();
                 fetchPopularVideos();
